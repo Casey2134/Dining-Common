@@ -12,7 +12,11 @@ public class Simulation {
     double nextEndServiceTime;
     double nextEndOrderServiceTime;
     // SingleServerQueue objects
-    GenericQueue<Job> entrance = new GenericQueue<>();
+    SingleServerQueue entrance = new SingleServerQueue();
+
+    // SingleServerQueue objects
+
+    SingleServerQueue[] entrances = new SingleServerQueue[]{entrance};
 
     // Station objects
     Station station1 = new Station("Kalamata Leaf", 0, 6, 9);
@@ -157,10 +161,10 @@ public class Simulation {
     private void doLoop() {
         //transferToPickup(currentTime)
         if(currentTime == nextArrivalTime){
-            entrance.enqueue(arrivalProcess.nextJob(currentTime));
+            entrance.add(arrivalProcess.nextJob(currentTime), currentTime);
             nextArrivalTime = currentTime + arrivalProcess.nextArrivalTime();
         } else if(currentTime == nextEndEntranceServiceTime){
-            addJob(entrance.dequeue(), currentTime, startTime);
+            addJob(entrance.dequeue(currentTime), currentTime, startTime);
             nextEndEntranceServiceTime = getNextEndEntranceServiceTime();
         } else if(currentTime == nextEndServiceTime){
             //End of Station
