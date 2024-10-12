@@ -161,10 +161,10 @@ public class Simulation {
     private void doLoop() {
         //transferToPickup(currentTime)
         if(currentTime == nextArrivalTime){
-            entrance.enqueue(arrivalProcess.nextJob(currentTime));
+            entrance.add(arrivalProcess.nextJob(currentTime), currentTime);
             nextArrivalTime = currentTime + arrivalProcess.nextArrivalTime();
         } else if(currentTime == nextEndEntranceServiceTime){
-            addJob(entrance.dequeue(), currentTime, startTime);
+            addJob(entrance.dequeue(currentTime), currentTime, startTime);
             nextEndEntranceServiceTime = getNextEndEntranceServiceTime();
         } else if(currentTime == nextEndServiceTime){
             //End of Station
