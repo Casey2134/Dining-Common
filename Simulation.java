@@ -47,6 +47,7 @@ public class Simulation {
         double totalJobs = 0;
         Job job;
         while ((job = completedJobs.get()) != null) {
+            printResults(job);
             averageServiceTime += job.getServiceTime();
             totalJobs++;
         }
@@ -60,11 +61,10 @@ public class Simulation {
     // adds a job to the server with the smallest queue
     private void addJob(Job job, double currentTime, double startTime) {
         //Selecting Food Station
-        Random random = new Random();
         GetProbabilities probabilityMaker = new GetProbabilities();
         double[] probabilities = probabilityMaker.getStationProb(6);
         for(int i = 0 ; i < stations.length ; i++){
-            double divideNumber = 1.0 + (stations[i].getOrderQueueLenth() / 20);
+            double divideNumber = 1.0 + ( (float) stations[i].getOrderQueueLenth() / 20);
                 double addToOthers = probabilities[i] / (5 * divideNumber);
                 probabilities[i] /= divideNumber;
                 for(int j = 0 ; j < stations.length ; j++){
@@ -85,10 +85,10 @@ public class Simulation {
         } else if(foodTime < 10.5){
             availableFood = stations[number].getBreakfast();
         } else{
-            availableFood = null;
+            availableFood = new Food[0];
         }
         double[] foodProbabilities = probabilityMaker.getStationProb(availableFood.length);
-        job.setFood(availableFood[getProbabilityIndex(foodProbabilities)]);
+        job.setFood(availableFood.length != 0 ? availableFood[getProbabilityIndex(foodProbabilities)] : null);
     }
 
     private int getProbabilityIndex(double[] probabilities){
@@ -99,7 +99,7 @@ public class Simulation {
                 probabilities[i] = 0;
             }
         }
-        int probabilityNumber = 100;
+        int probabilityNumber = 0;
         double lowestProbability = 100;
         for(int i = 0 ; i < probabilities.length ; i++){
             if(probabilities[i] > 0){
@@ -111,7 +111,7 @@ public class Simulation {
         return(probabilityNumber);
     }
 
-    // gets the service time closest to currnent time
+    // gets the service time closest to current time
     private double getNextEndServiceTime() {
         double nextEndServiceTime = Double.MAX_VALUE;
         for (int i = 0; i < stations.length; i++) {
@@ -185,8 +185,7 @@ public class Simulation {
         currentTime = closestTime;
 
     }
-    private boolean printResults(Job job){
-        boolean result = true;
+    private void printResults(Job job){
         File file = new File("src/Results.java");
         FileWriter writer;
         try {
@@ -195,8 +194,6 @@ public class Simulation {
             writer.close();
         }catch(IOException error){
             error.printStackTrace();
-            result = false;
         }
-        return(result);
     }
 }
