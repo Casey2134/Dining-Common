@@ -12,7 +12,11 @@ public class Simulation {
     double nextEndServiceTime;
     double nextEndOrderServiceTime;
     // SingleServerQueue objects
-    GenericQueue<Job> entrance = new GenericQueue<>();
+    SingleServerQueue entrance = new SingleServerQueue();
+
+    // SingleServerQueue objects
+
+    SingleServerQueue[] entrances = new SingleServerQueue[]{entrance};
 
     // Station objects
     Station station1 = new Station("Kalamata Leaf", 0, 6, 9);
