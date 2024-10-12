@@ -7,6 +7,7 @@ public class Job {
     private double serviceTime;
     private double endTime;
     private UUID uuid;
+    private Food food;
 
     public Job(double currentTime) {
         creationTime = currentTime;
@@ -49,6 +50,9 @@ public class Job {
     public String toString() {
         return (String.format("UUID = %s | Creation Time = %f, End Time = %f | Service Time = %f", uuid.toString(),
                 creationTime, endTime, serviceTime));
+    }
+    public void setFood(Food food){
+        this.food = food;
     }
 
     // UNIT TESTS
