@@ -13,25 +13,6 @@ public class Job {
         uuid = UUID.randomUUID();
     }
 
-    private class Preferences {
-        Random random = new Random();
-
-        public double[] getStationProb(int numOfStations) {
-            double upperBound = 100;
-            double[] stations = new double[numOfStations];
-            for (int i = 0; i < stations.length; i++) {
-                if (i == stations.length) {
-                    stations[i] = upperBound;
-
-                } else {
-                    stations[i] = random.nextDouble(upperBound);
-                    upperBound -= stations[i];
-                }
-            }
-            return stations;
-        }
-    }
-
     public void completed(double currentTime) {
         serviceTime = currentTime - creationTime;
         endTime = currentTime;
