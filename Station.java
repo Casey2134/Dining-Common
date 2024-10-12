@@ -82,6 +82,10 @@ public class Station {
         return (pickupQueue.getEndServiceTime());
     }
 
+    public double orderQueueGetEndServiceTime() {
+        return (orderQueue.getEndServiceTime());
+    }
+
     public int getOrderQueueLenth() {
         return orderQueue.length();
     }
