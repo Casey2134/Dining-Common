@@ -13,18 +13,6 @@ public class Job {
         uuid = UUID.randomUUID();
     }
 
-    private class Preferences {
-        Random random = new Random();
-        double upperBound = 100;
-
-        double station1prob = random.nextDouble(upperBound);
-        double station2prob;
-        double station3prob;
-        double station4prob;
-        double station5prob;
-        double station6prob;
-    }
-
     public void completed(double currentTime) {
         serviceTime = currentTime - creationTime;
         endTime = currentTime;
