@@ -15,14 +15,21 @@ public class Job {
 
     private class Preferences {
         Random random = new Random();
-        double upperBound = 100;
 
-        double station1prob = random.nextDouble(upperBound);
-        double station2prob;
-        double station3prob;
-        double station4prob;
-        double station5prob;
-        double station6prob;
+        public double[] getStationProb(int numOfStations) {
+            double upperBound = 100;
+            double[] stations = new double[numOfStations];
+            for (int i = 0; i < stations.length; i++) {
+                if (i == stations.length) {
+                    stations[i] = upperBound;
+
+                } else {
+                    stations[i] = random.nextDouble(upperBound);
+                    upperBound -= stations[i];
+                }
+            }
+            return stations;
+        }
     }
 
     public void completed(double currentTime) {
