@@ -1,3 +1,6 @@
+// --------------------                                                  --------------------
+// -------------------- STILL NEED TO FIND OUT HOW THE FOOD OPTIONS WORK --------------------
+// --------------------                                                  --------------------
 public class Station {
 
     public class FoodType {
