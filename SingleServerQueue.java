@@ -29,8 +29,13 @@ public class SingleServerQueue {
     }
 
     public Job complete(double currentTime) {
-        Job tempJob = jobInService;
+        Job tempJob = this.dequeue(currentTime);
         tempJob.completed(currentTime);
+        return tempJob;
+    }
+
+    public Job dequeue(double currentTime) {
+        Job tempJob = jobInService;
         if (queue.isEmpty()) {
             jobInService = null;
             nextEndServiceTime = Double.MAX_VALUE;
