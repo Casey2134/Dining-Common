@@ -1,6 +1,5 @@
 
 import java.util.UUID;
-import java.util.Random;
 
 public class Job {
     private double creationTime;
