@@ -10,4 +10,8 @@ public class Food {
         cookTime = random.nextDouble((1 / 60), (1 / 6));
     }
 
+    public double getCookTime() {
+        return cookTime;
+    }
+
 }
