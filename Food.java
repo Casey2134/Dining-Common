@@ -7,7 +7,7 @@ public class Food {
 
     public Food(int newName) {
         name = newName;
-        cookTime = random.nextDouble((1 / 60), (1 / 6));
+        cookTime = random.nextDouble();
     }
 
     public double getCookTime() {
