@@ -1,6 +1,6 @@
 public class ArrivalProcess {
     // the amount of customers coming to the store
-    final double arrivalRate = 0.30;
+    final double arrivalRate = 0.75;
 
     Exponential exponential = new Exponential();
 

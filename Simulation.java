@@ -1,23 +1,20 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Random;
 
 public class Simulation {
     // variables
     double currentTime = 0;
-    double startTime;
     double nextArrivalTime;
-    double nextEndEntranceServiceTime;
     double nextEndServiceTime;
-    double nextEndOrderServiceTime;
+    double nextEndOrderTime;
     // SingleServerQueue objects
-    SingleServerQueue entrance = new SingleServerQueue();
-
-    // SingleServerQueue objects
-
-    SingleServerQueue[] entrances = new SingleServerQueue[] { entrance };
-
+    SingleServerQueue server1 = new SingleServerQueue();
+    SingleServerQueue server2 = new SingleServerQueue();
+    // SingleServerQueue Array
+    SingleServerQueue[] servers = new SingleServerQueue[] { server1, server2 };
+    // ArrivalProcess Object
+    ArrivalProcess arrivalProcess = new ArrivalProcess();
+    // CompletedJobs Queue
+    CompletedJobs completedJobs = new CompletedJobs();
     // Station objects
     Station station1 = new Station("Kalamata Leaf", 0, 6, 9);
     Station station2 = new Station("Bamboo Bowl", 0, 5, 6);
@@ -27,21 +24,14 @@ public class Simulation {
     Station station6 = new Station("Nothing But Desserts", 0, 3, 3);
     // Station Array
     Station[] stations = new Station[] { station1, station2, station3, station4, station5, station6 };
-    // ArrivalProcess Object
-    ArrivalProcess arrivalProcess = new ArrivalProcess();
-    // CompletedJobs Queue
-    CompletedJobs completedJobs = new CompletedJobs();
 
     // runs simulation
-    public void run(double simTime, double startTime) {
-        this.startTime = startTime;
+    public void run(double simTime) {
         // adds first job as soon as sim starts
-        entrance.add(arrivalProcess.nextJob(currentTime), currentTime);
-        // begins simulation loop\
-        nextArrivalTime = arrivalProcess.nextArrivalTime();
-        nextEndEntranceServiceTime = getNextEndEntranceServiceTime();
+        addJob(arrivalProcess.nextJob(currentTime), currentTime);
+        nextEndOrderTime = getNextEndOrderTime();
         nextEndServiceTime = getNextEndServiceTime();
-        nextEndOrderServiceTime = getNextEndOrderServiceTime();
+        // begins simulation loop
         while (currentTime < simTime) {
             doLoop();
         }
@@ -51,7 +41,6 @@ public class Simulation {
         double totalJobs = 0;
         Job job;
         while ((job = completedJobs.get()) != null) {
-            // printResults(job);
             averageServiceTime += job.getServiceTime();
             totalJobs++;
         }
@@ -63,36 +52,30 @@ public class Simulation {
     }
 
     // adds a job to the server with the smallest queue
-    private void addJob(Job job, double currentTime, double startTime) {
-        // Selecting Food Station
-        GetProbabilities probabilityMaker = new GetProbabilities();
-        double[] probabilities = probabilityMaker.getStationProb(6);
+    private void addJob(Job job, double currentTime) {
+        int minJobs = 0;
+        int minQueueLength = stations[0].getOrderQueueLenth();
+        // iterating across the array of servers
         for (int i = 0; i < stations.length; i++) {
-            double divideNumber = 1.0 + ((float) stations[i].getOrderQueueLenth() / 20);
-            double addToOthers = probabilities[i] / (5 * divideNumber);
-            probabilities[i] /= divideNumber;
-            for (int j = 0; j < stations.length; j++) {
-                if (j != i) {
-                    probabilities[j] += addToOthers;
-                }
+            if (stations[i].getOrderQueueLenth() < minQueueLength) {
+                minJobs = i;
             }
+            stations[minJobs].addJob(job, currentTime);
         }
-        int number = getProbabilityIndex(probabilities);
-        stations[number].addJob(job, currentTime);
-        // Selecting Food Item
-        double foodTime = currentTime + startTime;
-        Food[] availableFood;
-        if (foodTime > 16.5) {
-            availableFood = stations[number].getDinner();
-        } else if (foodTime > 11 && foodTime < 14.5) {
-            availableFood = stations[number].getLunch();
-        } else if (foodTime < 10.5) {
-            availableFood = stations[number].getBreakfast();
-        } else {
-            availableFood = new Food[0];
-        }
-        double[] foodProbabilities = probabilityMaker.getStationProb(availableFood.length);
-        job.setFood(availableFood.length != 0 ? availableFood[getProbabilityIndex(foodProbabilities)] : null);
+        // GetProbabilities probabilityMaker = new GetProbabilities();
+        // double[] probabilities = probabilityMaker.getStationProb(6);
+        // for (int i = 0; i < stations.length; i++) {
+        // double divideNumber = 1.0 + ((float) stations[i].getOrderQueueLenth() / 20);
+        // double addToOthers = probabilities[i] / (5 * divideNumber);
+        // probabilities[i] /= divideNumber;
+        // for (int j = 0; j < stations.length; j++) {
+        // if (j != i) {
+        // probabilities[j] += addToOthers;
+        // }
+        // }
+        // }
+        // int number = getProbabilityIndex(probabilities);
+        // stations[number].addJob(job, currentTime);
     }
 
     private int getProbabilityIndex(double[] probabilities) {
@@ -116,6 +99,17 @@ public class Simulation {
     }
 
     // gets the service time closest to current time
+    private double getNextEndOrderTime() {
+        double nextEndServiceTime = Double.MAX_VALUE;
+        for (int i = 0; i < stations.length; i++) {
+            if (stations[i].orderQueueGetEndServiceTime() < nextEndServiceTime) {
+                nextEndServiceTime = stations[i].orderQueueGetEndServiceTime();
+            }
+
+        }
+        return nextEndServiceTime;
+    }
+
     private double getNextEndServiceTime() {
         double nextEndServiceTime = Double.MAX_VALUE;
         for (int i = 0; i < stations.length; i++) {
@@ -127,34 +121,21 @@ public class Simulation {
         return nextEndServiceTime;
     }
 
-    private double getNextEndOrderServiceTime() {
-        double nextEndServiceTime = Double.MAX_VALUE;
-        for (int i = 0; i < stations.length; i++) {
-            if (stations[i].orderQueueGetEndServiceTime() < nextEndServiceTime) {
-                nextEndServiceTime = stations[i].orderQueueGetEndServiceTime();
-            }
-
-        }
-        return nextEndServiceTime;
-    }
-
-    // gets the end of entrance time
-    private double getNextEndEntranceServiceTime() {
-        double nextEndServiceTime = Double.MAX_VALUE;
-        for (int i = 0; i < entrances.length; i++) {
-            if (entrances[i].getEndServiceTime() < nextEndServiceTime) {
-                nextEndServiceTime = entrances[i].getEndServiceTime();
-            }
-
-        }
-        return nextEndServiceTime;
-    }
-
     // returns the server that completes the next job
-    private Station getNextEndServer() {
+    private Station getNextEndOrder() {
         // will point to server with the next task to end
         Station nextEndServer = stations[0];
-        for (int i = 1; i < stations.length; i++) {
+        for (int i = 0; i < stations.length; i++) {
+            if (stations[i].orderQueueGetEndServiceTime() < nextEndServer.orderQueueGetEndServiceTime()) {
+                nextEndServer = stations[i];
+            }
+        }
+        return nextEndServer;
+    }
+
+    private Station getNextEndServer() {
+        Station nextEndServer = stations[0];
+        for (int i = 0; i < stations.length; i++) {
             if (stations[i].getEndServiceTime() < nextEndServer.getEndServiceTime()) {
                 nextEndServer = stations[i];
             }
@@ -162,45 +143,32 @@ public class Simulation {
         return nextEndServer;
     }
 
+    private double getNextEvent() {
+        if (nextArrivalTime < nextEndServiceTime && nextArrivalTime < nextEndOrderTime) {
+            return nextArrivalTime;
+        } else if (nextEndOrderTime < nextArrivalTime && nextEndOrderTime < nextEndServiceTime) {
+            return nextEndOrderTime;
+        } else {
+            return nextEndServiceTime;
+        }
+
+    }
+
     // simulation loop
     private void doLoop() {
-        // transferToPickup(currentTime)
         if (currentTime == nextArrivalTime) {
-            entrance.add(arrivalProcess.nextJob(currentTime), currentTime);
+            addJob(arrivalProcess.nextJob(currentTime), currentTime);
             nextArrivalTime = currentTime + arrivalProcess.nextArrivalTime();
-        } else if (currentTime == nextEndEntranceServiceTime) {
-            addJob(entrance.dequeue(currentTime), currentTime, startTime);
-            nextEndEntranceServiceTime = getNextEndEntranceServiceTime();
         } else if (currentTime == nextEndServiceTime) {
-            // End of Station
-            // Will add seconds here later
             completedJobs.add(getNextEndServer().completeJob(currentTime));
-            nextEndServiceTime = getNextEndServiceTime();
-        } else if (currentTime == nextEndOrderServiceTime) {
-            getNextEndServer().transferToPickup(currentTime);
-            nextEndOrderServiceTime = getNextEndOrderServiceTime();
+            nextEndServiceTime = currentTime + getNextEndServiceTime();
+        } else if (currentTime == nextEndOrderTime) {
+            getNextEndOrder().transferToPickup(currentTime);
+            nextEndOrderTime = currentTime + getNextEndOrderTime();
+            nextEndServiceTime = currentTime + getNextEndServiceTime();
         }
-        double[] endServiceTimes = new double[] { nextEndEntranceServiceTime, nextEndOrderServiceTime,
-                nextEndServiceTime, nextArrivalTime };
-        double closestTime = endServiceTimes[0];
-        for (int i = 1; i < endServiceTimes.length; i++) {
-            if (closestTime > endServiceTimes[i]) {
-                closestTime = endServiceTimes[i];
-            }
-        }
-        currentTime = closestTime;
+        currentTime = getNextEvent();
 
     }
 
-    private void printResults(Job job) {
-        File file = new File("Results.java");
-        FileWriter writer;
-        try {
-            writer = new FileWriter(file, true);
-            writer.append(job.toString()).append("\n");
-            writer.close();
-        } catch (IOException error) {
-            error.printStackTrace();
-        }
-    }
 }

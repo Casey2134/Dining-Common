@@ -13,6 +13,8 @@ class NormalDistribution extends RandomDistribution {
         }
         xi -= x * mu;
         xi /= Math.sqrt((float) x / 12);
+        System.out.println(sigma * xi + mu);
         return sigma * xi + mu;
+
     }
 }

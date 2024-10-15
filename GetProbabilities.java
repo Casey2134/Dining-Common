@@ -8,7 +8,7 @@ public class GetProbabilities {
         double upperBound = 100;
         double[] stations = new double[numOfStations];
         for (int i = 0; i < stations.length; i++) {
-            if (i == stations.length) {
+            if (i == stations.length - 1) {
                 stations[i] = upperBound;
 
             } else {
