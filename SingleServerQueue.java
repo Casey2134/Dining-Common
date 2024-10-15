@@ -29,9 +29,13 @@ public class SingleServerQueue {
     }
 
     public Job complete(double currentTime) {
-        Job tempJob = this.dequeue(currentTime);
-        tempJob.completed(currentTime);
-        return tempJob;
+        Job tempJob = dequeue(currentTime);
+        if (tempJob != null) {
+            tempJob.completed(currentTime);
+            return tempJob;
+        } else
+            System.out.println("Null job inputed");
+        return null;
     }
 
     public Job dequeue(double currentTime) {

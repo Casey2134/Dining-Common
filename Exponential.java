@@ -2,7 +2,7 @@ import java.util.Random;
 import java.lang.Math;
 
 class Exponential extends RandomDistribution {
-    final double lambda = 0.15;
+    final double lambda = 0.30;
     Random random = new Random();
 
     double sample() {
