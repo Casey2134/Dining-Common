@@ -5,10 +5,10 @@ public class GetProbabilities {
     Random random = new Random();
 
     public double[] getStationProb(int numOfStations) {
-        double upperBound = 100;
+        double upperBound = 100.0;
         double[] stations = new double[numOfStations];
         for (int i = 0; i < stations.length; i++) {
-            if (i == stations.length) {
+            if (i == stations.length - 1) {
                 stations[i] = upperBound;
 
             } else {

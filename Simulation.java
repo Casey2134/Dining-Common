@@ -90,7 +90,10 @@ public class Simulation {
             availableFood = new Food[0];
         }
         double[] foodProbabilities = probabilityMaker.getStationProb(availableFood.length);
-        job.setFood(availableFood.length != 0 ? availableFood[getProbabilityIndex(foodProbabilities)] : null);
+        int index = getProbabilityIndex(foodProbabilities);
+        if (index > -1) {
+            job.setFood(availableFood.length != 0 ? availableFood[index] : null);
+        }
     }
 
     private int getProbabilityIndex(double[] probabilities) {
@@ -156,7 +159,6 @@ public class Simulation {
             nextArrivalTime = currentTime + arrivalProcess.nextArrivalTime();
             nextEndEntranceServiceTime = getNextEndEntranceServiceTime();
         } else if (currentTime == nextEndEntranceServiceTime) {
-            System.out.println("ho");
             addJob(entrance.dequeue(currentTime), currentTime, startTime);
             nextEndEntranceServiceTime = getNextEndEntranceServiceTime();
         } else if (currentTime == nextEndServiceTime) {
@@ -166,6 +168,7 @@ public class Simulation {
             completedJobs.add(getNextEndServer().completeJob(currentTime));
             nextEndServiceTime = getNextEndServiceTime();
         } else if (currentTime == nextEndOrderServiceTime) {
+            System.out.println("hi");
             getNextEndServer().transferToPickup(currentTime);
             nextEndOrderServiceTime = getNextEndOrderServiceTime();
         }
